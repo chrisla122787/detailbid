@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DetailBid Studio — Stop undercharging. Quote every detail profitably.</title>
+<meta name="description" content="DetailBid Studio helps auto detailers stop undercharging. Set your target margin, price by vehicle size and condition, and send professional, deposit-ready quotes — with your real profit and margin kept private.">
+<style>
+  :root{
+    --ink:#1f1f23; --muted:#5d5d66; --brand:#c1272d; --brand-dark:#8f1d22;
+    --bg:#f7f6f5; --card:#ffffff; --line:#e3dedd; --accent:#fbeaea;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg); color:var(--ink); line-height:1.55;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 20px;}
+  header{background:var(--ink); color:#fff;}
+  header .wrap{display:flex; align-items:center; justify-content:space-between; padding:16px 20px;}
+  .logo{font-size:22px; font-weight:800; letter-spacing:.2px;}
+  .logo span{color:#f26d6d;}
+  header a{color:#fff; text-decoration:none; font-weight:600; font-size:15px;}
+  header a:hover{text-decoration:underline;}
+  .hero{padding:64px 0 48px; text-align:center;}
+  .hero h1{font-size:40px; line-height:1.15; max-width:720px; margin:0 auto 16px;}
+  .hero p{font-size:19px; color:var(--muted); max-width:640px; margin:0 auto 30px;}
+  .cta-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .btn{display:inline-block; padding:14px 28px; border-radius:8px; font-size:17px; font-weight:700;
+       text-decoration:none; border:2px solid transparent; cursor:pointer;}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-outline{background:#fff; color:var(--brand-dark); border-color:var(--brand);}
+  .btn-outline:hover{background:var(--accent);}
+  .price-note{margin-top:14px; color:var(--muted); font-size:15px;}
+  section{padding:44px 0;}
+  h2{font-size:27px; text-align:center; margin-bottom:30px;}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:24px;}
+  .step .num{width:36px; height:36px; border-radius:50%; background:var(--brand); color:#fff;
+             font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:12px;}
+  .step h3{font-size:18px; margin-bottom:8px;}
+  .step p{color:var(--muted); font-size:15px;}
+  .features{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
+  .feature{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .feature h3{font-size:17px; margin-bottom:6px;}
+  .feature p{color:var(--muted); font-size:15px;}
+  .feature .tag{display:inline-block; font-size:11.5px; font-weight:800; letter-spacing:.4px;
+                padding:2px 8px; border-radius:20px; margin-bottom:8px;}
+  .tag-free{background:var(--accent); color:var(--brand-dark);}
+  .tag-pro{background:var(--ink); color:#fff;}
+  .pricing{background:var(--card); border:1px solid var(--line); border-radius:12px;
+           max-width:540px; margin:0 auto; padding:34px; text-align:center;}
+  .pricing .badge{display:inline-block; background:#fdf0e6; color:#8a4b12;
+                  font-weight:800; font-size:13px; padding:4px 12px; border-radius:20px; margin-bottom:14px;}
+  .pricing .amount{font-size:46px; font-weight:800;}
+  .pricing .per{color:var(--muted); font-size:17px;}
+  .pricing .founding{margin-top:12px; font-size:15px; color:var(--ink);}
+  .pricing .standard{color:var(--muted); font-size:14px;}
+  .pricing ul{list-style:none; margin:20px 0 26px; text-align:left;}
+  .pricing li{padding:7px 0 7px 26px; position:relative; color:var(--ink); font-size:15.5px;}
+  .pricing li::before{content:"✓"; position:absolute; left:0; color:var(--brand); font-weight:800;}
+  .honest{background:var(--accent); border-radius:10px; padding:20px 24px; max-width:720px; margin:0 auto;
+          color:var(--brand-dark); font-size:15.5px; text-align:center;}
+  /* Sample quote */
+  .sample-cap{text-align:center; color:var(--muted); font-size:14.5px; margin-top:14px;}
+  .sample-doc{background:#fff; border:1px solid var(--line); border-radius:6px; max-width:680px;
+              margin:0 auto; padding:38px 42px; box-shadow:0 4px 18px rgba(31,31,35,.07); text-align:left;}
+  .sample-doc .co{font-size:21px; font-weight:800; color:var(--ink);}
+  .sample-doc .contact{color:var(--muted); font-size:13.5px; margin-bottom:4px;}
+  .sample-doc .rule{height:3px; background:var(--brand); border-radius:2px; margin:10px 0 20px;}
+  .sample-doc h3{font-size:17px; margin-bottom:4px;}
+  .sample-doc .date{color:var(--muted); font-size:13.5px; margin-bottom:18px;}
+  .sample-doc h4{font-size:14.5px; margin:18px 0 8px;}
+  .sample-doc p, .sample-doc li{font-size:14.5px;}
+  .sample-doc ul{margin:0 0 6px 20px;}
+  .sample-doc .kv{display:flex; gap:10px; font-size:14.5px; padding:3px 0;}
+  .sample-doc .kv b{min-width:150px;}
+  .sample-doc .line-item{display:flex; justify-content:space-between; font-size:14.5px; padding:4px 0; border-bottom:1px dashed var(--line);}
+  .sample-doc .line-item span:last-child{font-weight:700; font-variant-numeric:tabular-nums;}
+  .sample-doc .invest{font-size:16px; margin-top:10px;}
+  .sample-doc .invest b{color:var(--brand-dark); font-size:19px;}
+  .sample-doc .sig{margin-top:30px; display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .sample-doc .sig .line{border-top:1px solid var(--ink); padding-top:5px; font-size:12.5px; color:var(--muted);}
+  .policies{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .policy{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .policy h3{font-size:17px; margin-bottom:8px;}
+  .policy p{color:var(--muted); font-size:15px;}
+  footer{border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted); font-size:14.5px; text-align:center;}
+  footer a{color:var(--brand-dark);}
+  @media (max-width:720px){
+    .steps,.features,.policies{grid-template-columns:1fr;}
+    .hero h1{font-size:31px;}
+    .hero{padding:44px 0 34px;}
+    .sample-doc{padding:26px 22px;}
+    .sample-doc .sig{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">DetailBid <span>Studio</span></div>
+    <a href="app.html">Open the quote builder</a>
+  </div>
+</header>
+
+<div class="hero wrap">
+  <h1>Stop undercharging. Quote every detail profitably.</h1>
+  <p>DetailBid Studio shows you what every detailing job actually earns <em>before</em> you send the
+     quote. Set your target margin, price by vehicle size and condition, and send a professional,
+     deposit-ready quote in under a minute. No more losing money on the big SUV with pet hair in every seat.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r">Subscribe — $19/month founding price</a>
+    <a class="btn btn-outline" href="app.html">Try the quote builder free</a>
+  </div>
+  <p class="price-note">The full calculator and a watermarked quote preview are free — and your first clean PDF quote is free too. Profit Guard is free in the calculator: set your target margin and we'll warn you before you send a quote that underpays you. Pro unlocks unlimited PDFs, saved quotes, your price book, and the quote dashboard.</p>
+</div>
+
+<section class="wrap">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <h3>Build your price book once</h3>
+      <p>Your packages, your add-ons, your vehicle-size multipliers. Set your prices one time — every quote after that is consistent, whoever builds it.</p>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <h3>Quote in under a minute</h3>
+      <p>Customer, vehicle, package, add-ons, condition. The price updates as you tap — and your private view shows estimated hours, your costs, your profit, and your true margin before you ever send it. Profit Guard flags any quote below your target margin and tells you the exact price that protects it.</p>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <h3>Send a quote that looks the part</h3>
+      <p>Download a clean PDF quote with your logo, the line items, the total, and an acceptance line. Your costs and margin never appear on the customer copy — prices and services only.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>What you get</h2>
+  <div class="features">
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Full quote calculator</h3>
+      <p>Ten starter packages, seven add-ons, vehicle-size multipliers, and a condition adjustment for light, moderate, or heavy soil — by percentage, fixed amount, or extra labor hours — every number live, with a plain-words warning if your margin runs thin.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Profit Guard — stop undercharging</h3>
+      <p>Set your target margin once. Every quote shows the minimum price that protects it, your earnings per working hour, and a plain warning when a quote underpays you — with one tap to fix the price. Your target and your numbers stay private; the customer only ever sees the price.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Watermarked preview + first PDF free</h3>
+      <p>See exactly how your quote will look — your shop name, the customer, the vehicle, the line items, the total — right on screen, free. Your first clean, unwatermarked PDF quote is free too.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>Professional PDF quotes</h3>
+      <p>Your logo and contact info, itemized packages and add-ons, tax if you charge it, a 14-day validity line, terms, and a customer acceptance block. Make quotes deposit-ready: add your own payment link and the deposit and remaining balance print right on the quote. Your hourly rate, product costs, and margin stay private — always.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>Price book, saved quotes &amp; dashboard</h3>
+      <p>Edit every package price, add-on, and size multiplier — or set an exact price per package per vehicle size — and it sticks. Save every quote, mark it Draft, Sent, Accepted, Declined, or Completed, and watch your pipeline and accepted totals add up. A follow-up queue flags sent quotes waiting too long, with a ready-to-paste message for each one. Export a backup file or a CSV anytime.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>See a sample quote</h2>
+  <div class="sample-doc">
+    <div class="co">GlossWorks Detailing</div>
+    <div class="contact">(555) 014-2288 · quotes@glossworks.example</div>
+    <div class="rule"></div>
+    <h3>Detailing Service Quote</h3>
+    <div class="date">Prepared for: <strong>Dana Whitfield</strong> · Vehicle: 2022 Ford Explorer (SUV) · Date: November 23, 2026</div>
+
+    <h4>Services</h4>
+    <div class="line-item"><span>Full Detail (SUV)</span><span>$311.25</span></div>
+    <div class="line-item"><span>Pet hair removal</span><span>$45.00</span></div>
+    <div class="line-item"><span>Engine bay cleaning</span><span>$40.00</span></div>
+
+    <h4>Totals</h4>
+    <div class="kv"><b>Subtotal</b><span>$396.25</span></div>
+    <div class="kv"><b>Condition</b><span>Light — no adjustment</span></div>
+    <div class="kv"><b>Estimated time</b><span>About 5 hours</span></div>
+    <p class="invest">Quote total: <b>$396.25</b></p>
+
+    <h4>Terms</h4>
+    <p>This quote is valid for 14 days from the date above. Prices cover the services listed; additional services requested on the day will be quoted before work begins.</p>
+
+    <div class="sig">
+      <div class="line">Accepted by (customer name)</div>
+      <div class="line">Signature &amp; date</div>
+    </div>
+  </div>
+  <p class="sample-cap">Sample quote — GlossWorks Detailing and Dana Whitfield are fictional. Full Detail is $249 for a sedan; the SUV multiplier (×1.25) makes it $311.25, plus $45 pet hair and $40 engine bay = $396.25. Your quotes carry your logo, your price book, and your prices.</p>
+</section>
+
+<section class="wrap">
+  <h2>Simple pricing</h2>
+  <div class="pricing">
+    <div class="badge">FOUNDING MEMBERS — FIRST 25 CUSTOMERS</div>
+    <div class="amount">$19</div>
+    <div class="per">per month</div>
+    <p class="founding"><strong>$19/month founding-member pricing</strong> — locked in while your subscription stays active.</p>
+    <p class="standard">Standard price $29/month after the founding spots are gone.</p>
+    <ul>
+      <li>Full calculator + watermarked preview — free forever</li>
+      <li>Your first clean PDF quote — free</li>
+      <li>Unlimited clean, branded PDF quotes with your logo</li>
+      <li>Profit Guard — target-margin protection on every quote</li>
+      <li>Editable price book — packages, add-ons, size multipliers, per-size price overrides</li>
+      <li>Deposit-ready quotes — your payment link, deposit + balance on the PDF</li>
+      <li>Follow-up queue for sent quotes</li>
+      <li>Unlimited saved quotes + quote dashboard</li>
+      <li>Backup export / restore + CSV export</li>
+      <li>Works on phone, tablet, and computer</li>
+      <li>Cancel anytime</li>
+    </ul>
+    <a class="btn btn-primary" href="https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r">Subscribe — $19/month founding price</a>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="honest">
+    <strong>Straight talk:</strong> DetailBid Studio is a new tool from a small independent maker.
+    We don't post testimonials or customer counts we don't have. Your quotes and your price book live
+    only in your own browser — nothing is uploaded to us. Try the builder free — if it doesn't help you
+    quote faster and price better, don't subscribe.
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>The fine print, in plain words</h2>
+  <div class="policies">
+    <div class="policy">
+      <h3>Privacy</h3>
+      <p>Your quotes, your price book, your shop info, and your logo are stored only in your own browser
+         on your own device. Nothing you type into the quote builder is uploaded to us or anyone else —
+         there is no account and no tracking of your numbers. Export a backup file from the app regularly,
+         because clearing your browser data erases what's saved here.</p>
+    </div>
+    <div class="policy">
+      <h3>Billing &amp; cancellation</h3>
+      <p>Subscriptions are billed monthly through Stripe. You can cancel anytime from your Stripe
+         receipt or the Stripe customer portal — no email to us required, no cancellation fee.
+         When you cancel, Pro stays active until the end of the period you already paid for, and the
+         free calculator keeps working either way.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    DetailBid Studio · Questions? Email <a href="mailto:chrisla122787@gmail.com">chrisla122787@gmail.com</a>
+  </div>
+</footer>
+
+</body>
+</html>

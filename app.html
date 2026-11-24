@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DetailBid Studio — Quote Builder</title>
+<style>
+  :root{
+    --ink:#1f1f23; --muted:#5d5d66; --brand:#c1272d; --brand-dark:#8f1d22;
+    --bg:#f7f6f5; --card:#ffffff; --line:#e3dedd; --accent:#fbeaea;
+    --warn-bg:#fdf0e6; --warn-ink:#8a4b12; --warn-line:#f0c491;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg); color:var(--ink); line-height:1.5;}
+  .wrap{max-width:1020px; margin:0 auto; padding:0 20px 48px;}
+  header{background:var(--ink); color:#fff; margin-bottom:28px;}
+  header .inner{max-width:1020px; margin:0 auto; padding:16px 20px; display:flex;
+                align-items:center; justify-content:space-between;}
+  .logo{font-size:22px; font-weight:800;}
+  .logo span{color:#f26d6d;}
+  header a{color:#fff; text-decoration:none; font-weight:600; font-size:15px;}
+  header a:hover{text-decoration:underline;}
+  h1{font-size:26px; margin-bottom:4px;}
+  .sub{color:var(--muted); margin-bottom:22px;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .card h2{font-size:18px; margin-bottom:16px;}
+  .card h2 .pro-tag{display:inline-block; background:var(--ink); color:#fff; font-size:11px;
+                    font-weight:800; letter-spacing:.4px; padding:2px 8px; border-radius:20px;
+                    vertical-align:middle; margin-left:8px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:14px; font-weight:600; margin-bottom:5px;}
+  .field .hint{font-weight:400; color:var(--muted); font-size:12.5px;}
+  .field input[type=text], .field input[type=number], .field input[type=email], .field input[type=tel],
+  .field select{
+    width:100%; padding:10px 12px; font-size:16px; border:1px solid var(--line);
+    border-radius:7px; background:#fff; color:var(--ink);}
+  .field input:focus, .field select:focus{outline:2px solid var(--brand); outline-offset:0; border-color:var(--brand);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .check{display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:15px; cursor:pointer;}
+  .check input{width:18px; height:18px; margin-top:2px; accent-color:var(--brand); flex:none;}
+  .check .price{margin-left:auto; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; padding-left:10px;}
+  .result-row{display:flex; justify-content:space-between; align-items:baseline;
+              padding:9px 0; border-bottom:1px solid var(--line); font-size:15.5px;}
+  .result-row:last-of-type{border-bottom:none;}
+  .result-row .lbl{color:var(--muted);}
+  .result-row .val{font-weight:700; font-variant-numeric:tabular-nums;}
+  .result-row.big{padding:14px 0;}
+  .result-row.big .lbl{color:var(--ink); font-weight:700; font-size:17px;}
+  .result-row.big .val{font-size:26px; color:var(--brand-dark);}
+  .result-row.profit .val{color:var(--brand-dark);}
+  .warning{display:none; background:var(--warn-bg); border:1px solid var(--warn-line);
+           color:var(--warn-ink); border-radius:8px; padding:12px 14px; font-size:14.5px; margin-top:14px;}
+  .btn{display:inline-block; padding:12px 22px; border-radius:8px; font-size:16px; font-weight:700;
+       border:2px solid transparent; cursor:pointer; text-decoration:none; text-align:center;}
+  .btn-primary{background:var(--brand); color:#fff; width:100%;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-ghost{background:#fff; color:var(--brand-dark); border-color:var(--brand);}
+  .btn-ghost:hover{background:var(--accent);}
+  .btn-small{padding:6px 12px; font-size:13.5px; border-radius:6px;}
+  .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  .save-row{display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;}
+  .save-row input{flex:1; min-width:160px; padding:10px 12px; font-size:15px; border:1px solid var(--line); border-radius:7px;}
+  .saved-list{margin-top:14px;}
+  .saved-item{display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .saved-item:last-child{border-bottom:none;}
+  .saved-item .name{flex:1; min-width:120px; font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .saved-item .amt{font-weight:700; font-size:14.5px; font-variant-numeric:tabular-nums;}
+  .saved-item .date{color:var(--muted); font-size:12.5px;}
+  .saved-item select{padding:6px 8px; font-size:13.5px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink);}
+  .status{font-size:11.5px; font-weight:800; letter-spacing:.3px; padding:2px 8px; border-radius:20px;}
+  .st-Draft{background:#eef2f6; color:var(--muted);}
+  .st-Sent{background:#e3ecfd; color:#274b9f;}
+  .st-Accepted{background:var(--accent); color:var(--brand-dark);}
+  .st-Declined{background:#fdecec; color:#9f2727;}
+  .st-Completed{background:#e8f4f0; color:#0a5c48;}
+  .empty-note{color:var(--muted); font-size:14.5px;}
+  .stack{display:grid; gap:20px;}
+  .fineprint{color:var(--muted); font-size:13px; margin-top:12px;}
+  .data-note{background:var(--warn-bg); border:1px solid var(--warn-line); color:var(--warn-ink);
+             border-radius:8px; padding:12px 14px; font-size:14.5px;}
+  .data-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .pb-group{margin-bottom:18px;}
+  .pb-group h3{font-size:15px; margin-bottom:8px;}
+  .pb-row{display:grid; grid-template-columns:1fr 110px; gap:10px; align-items:center; padding:4px 0;}
+  .pb-row label{font-size:14.5px;}
+  .pb-row input{width:100%; padding:8px 10px; font-size:15px; border:1px solid var(--line); border-radius:6px;}
+  .pb-matrix-row{display:grid; grid-template-columns:1.4fr repeat(5,1fr); gap:8px; align-items:center; padding:4px 0;}
+  .pb-matrix-row input{width:100%; padding:8px 9px; font-size:14px; border:1px solid var(--line); border-radius:6px;}
+  .pb-matrix-head{font-size:12.5px; font-weight:700; color:var(--muted);}
+  .guard{background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:8px; padding:12px 14px; font-size:14.5px; margin-top:14px;}
+  .guard .btn{margin-top:10px;}
+  .followup-item{display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); flex-wrap:wrap; font-size:14.5px;}
+  .followup-item:last-child{border-bottom:none;}
+  .followup-item .name{flex:1; min-width:140px; font-weight:600;}
+  .followup-item .amt{font-weight:700; font-variant-numeric:tabular-nums;}
+  .followup-item .days{color:var(--muted); font-size:13px;}
+  /* Watermarked preview */
+  .preview-doc{position:relative; overflow:hidden; background:#fff; border:1px solid var(--line);
+               border-radius:6px; padding:28px 30px; margin-top:6px;}
+  .preview-doc .wm{position:absolute; inset:-40%; display:flex; flex-wrap:wrap; align-content:center;
+                   justify-content:center; gap:34px 44px; transform:rotate(-28deg);
+                   pointer-events:none; z-index:2;}
+  .preview-doc .wm span{font-size:25px; font-weight:800; letter-spacing:1px; color:var(--ink); opacity:.07; white-space:nowrap;}
+  .preview-doc .inner{position:relative; z-index:1;}
+  .preview-doc .co{font-size:19px; font-weight:800;}
+  .preview-doc .contact{color:var(--muted); font-size:12.5px;}
+  .preview-doc .rule{height:3px; background:var(--brand); border-radius:2px; margin:8px 0 14px;}
+  .preview-doc h3{font-size:15.5px; margin-bottom:2px;}
+  .preview-doc .pdate{color:var(--muted); font-size:12.5px; margin-bottom:12px;}
+  .preview-doc h4{font-size:13.5px; margin:13px 0 5px;}
+  .preview-doc p, .preview-doc li{font-size:13.5px;}
+  .preview-doc ul{margin:0 0 4px 18px;}
+  .preview-doc .li-row{display:flex; justify-content:space-between; font-size:13.5px; padding:3px 0; border-bottom:1px dashed var(--line);}
+  .preview-doc .li-row span:last-child{font-weight:700; font-variant-numeric:tabular-nums;}
+  .preview-doc .kv{display:flex; gap:8px; font-size:13.5px; padding:2px 0;}
+  .preview-doc .kv b{min-width:132px;}
+  .preview-doc .invest b{color:var(--brand-dark); font-size:16.5px;}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr;} .row2,.row3{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">DetailBid <span>Studio</span></div>
+    <a href="index.html">← Back to home</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>Quote builder</h1>
+  <p class="sub"><strong>Stop undercharging. Quote every detail profitably.</strong> Pick the package, the vehicle, and the add-ons. Your price updates as you tap — and your private view shows your costs, profit, and true margin before you send anything. Profit Guard warns you when a quote falls below the margin you want. The calculator and the watermarked preview below are free, and your first clean PDF is free too.</p>
+
+  <div class="grid">
+    <!-- LEFT: inputs -->
+    <div class="stack">
+      <div class="card">
+        <h2>Your shop</h2>
+        <div class="field">
+          <label for="shopName">Shop name <span class="hint">— printed on the quote</span></label>
+          <input type="text" id="shopName" placeholder="e.g. GlossWorks Detailing" autocomplete="off">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="shopPhone">Phone <span class="hint">— optional</span></label>
+            <input type="tel" id="shopPhone" placeholder="e.g. (916) 555-0142" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="shopEmail">Email <span class="hint">— optional</span></label>
+            <input type="email" id="shopEmail" placeholder="e.g. quotes@yourshop.com" autocomplete="off">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logoInput">Shop logo <span class="hint">— PNG or JPG, shown on the Pro PDF</span></label>
+          <input type="file" id="logoInput" accept="image/png,image/jpeg">
+          <p class="fineprint" id="logoStatus">No logo uploaded.</p>
+          <button class="btn btn-ghost btn-small" id="removeLogoBtn" type="button" style="display:none;">Remove logo</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Customer &amp; vehicle</h2>
+        <div class="field">
+          <label for="customerName">Customer name <span class="hint">— who the quote is prepared for</span></label>
+          <input type="text" id="customerName" placeholder="e.g. Dana Whitfield" autocomplete="off">
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label for="vehicleYear">Year</label>
+            <input type="text" id="vehicleYear" placeholder="2022" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="vehicleMake">Make</label>
+            <input type="text" id="vehicleMake" placeholder="Ford" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="vehicleModel">Model</label>
+            <input type="text" id="vehicleModel" placeholder="Explorer" autocomplete="off">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="vehicleType">Vehicle size <span class="hint">— package prices adjust by size</span></label>
+          <select id="vehicleType">
+            <option value="coupe">Coupe</option>
+            <option value="sedan" selected>Sedan</option>
+            <option value="suv">SUV</option>
+            <option value="truck">Truck</option>
+            <option value="row3">3-Row SUV / Van</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Package <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— priced for the vehicle size above</span></h2>
+        <div id="packageList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Add-ons</h2>
+        <div id="addonList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Job details</h2>
+        <div class="row2">
+          <div class="field">
+            <label for="conditionPreset">Vehicle condition</label>
+            <select id="conditionPreset">
+              <option value="light" selected>Light soil</option>
+              <option value="moderate">Moderate soil</option>
+              <option value="heavy">Heavy soil</option>
+              <option value="custom">Custom %</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="conditionMode">Condition adjustment type</label>
+            <select id="conditionMode">
+              <option value="pct" selected>Percentage of the job</option>
+              <option value="fixed">Fixed amount ($)</option>
+              <option value="hours">Extra labor hours</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field" id="condPctField">
+            <label for="conditionPct">Condition adjustment (%)</label>
+            <input type="number" id="conditionPct" min="0" step="any" value="0">
+          </div>
+          <div class="field" id="condFixedField" style="display:none;">
+            <label for="conditionFixed">Condition adjustment ($)</label>
+            <input type="number" id="conditionFixed" min="0" step="any" value="0">
+          </div>
+          <div class="field" id="condHoursField" style="display:none;">
+            <label for="conditionHours">Extra labor hours</label>
+            <input type="number" id="conditionHours" min="0" step="any" value="0">
+          </div>
+          <div class="field">
+            <label for="taxPct">Tax (%) <span class="hint">— optional, only if you charge it</span></label>
+            <input type="number" id="taxPct" min="0" step="any" value="0">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="estHours">Estimated hours</label>
+            <input type="number" id="estHours" min="0" step="any" value="5">
+          </div>
+          <div class="field">
+            <label for="targetMarginPct">Target margin (%) <span class="hint">— Profit Guard</span></label>
+            <input type="number" id="targetMarginPct" min="0" max="95" step="any" value="40">
+          </div>
+        </div>
+        <p class="hint" style="color:var(--muted); font-size:13px; margin-bottom:12px;">Your costs — private, never shown to the customer:</p>
+        <div class="row2">
+          <div class="field">
+            <label for="hourlyRate">Your hourly rate ($/hour)</label>
+            <input type="number" id="hourlyRate" min="0" step="any" value="35">
+          </div>
+          <div class="field">
+            <label for="suppliesCost">Products &amp; supplies ($)</label>
+            <input type="number" id="suppliesCost" min="0" step="any" value="18">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="travelCost">Travel &amp; fuel ($)</label>
+            <input type="number" id="travelCost" min="0" step="any" value="0">
+          </div>
+          <div class="field">
+            <label for="overheadCost">Job overhead ($)</label>
+            <input type="number" id="overheadCost" min="0" step="any" value="0">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="processingPct">Payment processing (%) <span class="hint">— card fees on this job, counted in your cost</span></label>
+          <input type="number" id="processingPct" min="0" step="any" value="0">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Deposits &amp; follow-up</h2>
+        <div class="field">
+          <label for="depositType">Deposit to reserve the appointment</label>
+          <select id="depositType">
+            <option value="none" selected>No deposit</option>
+            <option value="pct">Percentage of the quote total</option>
+            <option value="fixed">Fixed amount ($)</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field" id="depositPctField" style="display:none;">
+            <label for="depositPct">Deposit (%)</label>
+            <input type="number" id="depositPct" min="0" max="100" step="any" value="25">
+          </div>
+          <div class="field" id="depositFixedField" style="display:none;">
+            <label for="depositFixed">Deposit ($)</label>
+            <input type="number" id="depositFixed" min="0" step="any" value="0">
+          </div>
+          <div class="field">
+            <label for="followupDays">Follow up on Sent quotes after (days)</label>
+            <input type="number" id="followupDays" min="1" step="1" value="3">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="paymentLink">Your payment link <span class="hint">— your own Stripe, Venmo, Cash App, or bank link. The customer pays you directly; DetailBid never touches the money.</span></label>
+          <input type="text" id="paymentLink" placeholder="Your Stripe, Venmo, or Cash App payment link" autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: results + preview + pro -->
+    <div class="stack">
+      <div class="card">
+        <h2>Your numbers <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— private, never shown to the customer</span></h2>
+        <div class="result-row"><span class="lbl">Package price</span><span class="val" id="rPackage">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Add-ons</span><span class="val" id="rAddons">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Subtotal</span><span class="val" id="rSubtotal">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Condition adjustment</span><span class="val" id="rConditionAdj">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Tax</span><span class="val" id="rTax">$0.00</span></div>
+        <div class="result-row big"><span class="lbl">Quote total</span><span class="val" id="rTotal">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Estimated hours</span><span class="val" id="rEstHours">0</span></div>
+        <div class="result-row"><span class="lbl">Your estimated cost (labor + products + extras)</span><span class="val" id="rCost">$0.00</span></div>
+        <div class="result-row profit"><span class="lbl">Estimated job profit</span><span class="val" id="rProfit">$0.00</span></div>
+        <div class="result-row profit"><span class="lbl">Profit margin (share of the price)</span><span class="val" id="rMargin">0%</span></div>
+        <div class="result-row"><span class="lbl">Earnings per working hour</span><span class="val" id="rEarnHr">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Minimum price for your target margin</span><span class="val" id="rMinPrice">$0.00</span></div>
+
+        <div class="guard" id="guardWarning" style="display:none;">
+          <strong>Profit Guard:</strong> <span id="guardText"></span>
+          <br><button class="btn btn-primary btn-small" id="applyGuardBtn" type="button">Apply recommended price</button>
+        </div>
+        <div class="fineprint" id="adjNote" style="display:none;">
+          A price adjustment of <strong id="adjAmount">$0.00</strong> is on this quote, bringing it up to your target margin.
+          <button class="btn btn-ghost btn-small" id="removeAdjBtn" type="button" style="margin-left:6px;">Remove adjustment</button>
+        </div>
+
+        <div class="warning" id="marginWarning">
+          <strong>Careful:</strong> a profit margin under 10% is very thin. One extra hour of pet-hair
+          work, one broken extractor, or one no-show can turn this job into a loss. Most healthy
+          detailing jobs run 25–45% margin.
+        </div>
+
+        <div style="margin-top:20px;">
+          <button class="btn btn-primary" id="pdfBtn" type="button">Download clean PDF quote</button>
+          <p class="fineprint" id="pdfNote">Your first clean PDF quote is free — no watermark, your logo, ready to send. After that, PDFs are a Pro feature.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Quote preview <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— free, watermarked</span></h2>
+        <div class="preview-doc" id="previewDoc">
+          <div class="wm" aria-hidden="true">
+            <span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span>
+            <span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span>
+            <span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span>
+            <span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span><span>PREVIEW — DetailBid Studio</span>
+          </div>
+          <div class="inner">
+            <div class="co" id="pvShop">Your Detailing Shop</div>
+            <div class="contact" id="pvContact"></div>
+            <div class="rule"></div>
+            <h3>Detailing Service Quote</h3>
+            <div class="pdate">Prepared for: <strong id="pvCustomer">Your Customer</strong> · <span id="pvDate"></span></div>
+            <div class="kv"><b>Vehicle</b><span id="pvVehicle">—</span></div>
+            <h4>Services</h4>
+            <div id="pvLines"></div>
+            <h4>Totals</h4>
+            <div class="kv"><b>Subtotal</b><span id="pvSubtotal">—</span></div>
+            <div class="kv"><b>Condition</b><span id="pvCondition">—</span></div>
+            <div class="kv" id="pvTaxRow" style="display:none;"><b>Tax</b><span id="pvTax">—</span></div>
+            <div class="kv"><b>Estimated time</b><span id="pvHours">—</span></div>
+            <p class="invest">Quote total: <b id="pvTotal">—</b></p>
+            <div id="pvDeposit" style="display:none; margin-top:10px; border-top:1px dashed var(--line); padding-top:10px;">
+              <p><b>Deposit to reserve your appointment: <span id="pvDepositAmt">—</span></b></p>
+              <p id="pvDepositLinkRow">Pay the deposit here: <span id="pvDepositLink">—</span></p>
+              <p>Remaining balance due at service: <span id="pvDepositBal">—</span></p>
+            </div>
+            <h4>Terms</h4>
+            <p id="pvTerms">—</p>
+          </div>
+        </div>
+        <p class="fineprint">This is what your customer sees — services and prices only. Your hourly rate, product costs, profit, and margin never appear here or on the PDF.</p>
+      </div>
+
+      <!-- PRO GATE (shown when Pro is locked) -->
+      <div class="card" id="proGate">
+        <h2>DetailBid Studio Pro <span class="pro-tag">PRO</span></h2>
+        <p style="font-size:15px; margin-bottom:6px;">Unlock unlimited clean PDF quotes, your editable price book, saved quotes, the quote dashboard, and backup export.</p>
+        <p style="font-size:15px; margin-bottom:16px;"><strong>$19/month founding-member pricing</strong> — locked in while your subscription stays active. Standard price $29.</p>
+        <a class="btn btn-primary" id="subscribeBtn" href="https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r" style="margin-bottom:12px;">Subscribe — $19/month</a>
+        <button class="btn btn-ghost" id="unlockBtn" type="button" style="width:100%;">I already subscribed — unlock Pro</button>
+        <p class="fineprint">Launch note: during our opening validation, unlocking is on the honor system — please subscribe first; the button simply turns Pro on for this browser on this device.</p>
+      </div>
+
+      <!-- PRO AREA (shown when Pro is unlocked) -->
+      <div id="proArea" style="display:none;">
+        <div class="stack">
+          <div class="card">
+            <h2>Your price book <span class="pro-tag">PRO</span></h2>
+            <p class="hint" style="color:var(--muted); font-size:13px; margin-bottom:14px;">Your prices, saved in this browser. New quotes use the new prices right away — quotes you already saved keep the prices they were saved with.</p>
+            <div class="pb-group">
+              <h3>Package base prices (sedan)</h3>
+              <div id="pbPackages"></div>
+            </div>
+            <div class="pb-group">
+              <h3>Vehicle-size multipliers</h3>
+              <div id="pbMultipliers"></div>
+            </div>
+            <div class="pb-group">
+              <h3>Add-on prices</h3>
+              <div id="pbAddons"></div>
+            </div>
+            <div class="pb-group">
+              <h3>Price by vehicle size — optional overrides</h3>
+              <p class="hint" style="color:var(--muted); font-size:13px; margin-bottom:10px;">Leave a cell blank to use base price × multiplier. Enter a price to fix that package for that vehicle size — useful when a big SUV costs more than the multiplier allows, or a small coupe costs less.</p>
+              <div id="pbMatrix"></div>
+            </div>
+            <div class="data-row">
+              <button class="btn btn-ghost btn-small" id="savePriceBookBtn" type="button">Save price book</button>
+              <button class="btn btn-ghost btn-small" id="resetPriceBookBtn" type="button">Reset to starter prices</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Quote dashboard <span class="pro-tag">PRO</span></h2>
+            <div class="result-row"><span class="lbl">Active pipeline (Draft + Sent)</span><span class="val" id="totPipeline">$0.00</span></div>
+            <div class="result-row"><span class="lbl">Accepted work (Accepted + Completed)</span><span class="val" id="totAccepted">$0.00</span></div>
+            <div class="save-row">
+              <input type="text" id="quoteName" placeholder="Name this quote, e.g. Whitfield — Explorer Full Detail" autocomplete="off">
+              <button class="btn btn-ghost" id="saveQuoteBtn" type="button">Save quote</button>
+            </div>
+            <div class="saved-list" id="savedList"></div>
+            <h3 style="font-size:15px; margin-top:18px; margin-bottom:6px;">Needs follow-up</h3>
+            <p class="hint" style="color:var(--muted); font-size:13px; margin-bottom:8px;">Sent quotes waiting longer than the follow-up days you set. Nothing is sent automatically — copy the message and send it yourself.</p>
+            <div id="followupList"></div>
+          </div>
+
+          <div class="card">
+            <h2>Your data <span class="pro-tag">PRO</span></h2>
+            <div class="data-note"><strong>Your data is stored only in this browser on this device</strong> — export a backup regularly. Clearing browser data erases saved quotes and your price book.</div>
+            <div class="data-row">
+              <button class="btn btn-ghost btn-small" id="exportBackupBtn" type="button">Export backup (JSON)</button>
+              <button class="btn btn-ghost btn-small" id="exportCsvBtn" type="button">Export quotes (CSV)</button>
+              <label class="btn btn-ghost btn-small" for="importInput" style="cursor:pointer;">Import backup…</label>
+              <input type="file" id="importInput" accept="application/json,.json" style="display:none;">
+            </div>
+            <div class="data-row">
+              <button class="btn btn-ghost btn-small" id="lockBtn" type="button">Lock Pro on this device</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // Stripe subscription payment link goes here at launch (founding $19/mo).
+  var https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r = "https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r";
+
+  var SETTINGS_KEY   = "detailbid.settings.v1";
+  var PRICEBOOK_KEY  = "detailbid.pricebook.v1";
+  var QUOTES_KEY     = "detailbid.quotes.v1";
+  var PRO_KEY        = "detailbid.pro.v1";
+  var FREEPDF_KEY    = "detailbid.freepdf.v1";
+
+  var STATUSES = ["Draft","Sent","Accepted","Declined","Completed"];
+  var VEHICLE_TYPES = [
+    {id:"coupe", label:"Coupe"},
+    {id:"sedan", label:"Sedan"},
+    {id:"suv",   label:"SUV"},
+    {id:"truck", label:"Truck"},
+    {id:"row3",  label:"3-Row SUV / Van"}
+  ];
+  var CONDITION_PRESETS = { light: 0, moderate: 10, heavy: 20 };
+  var CONDITION_LABELS  = { light: "Light soil", moderate: "Moderate soil", heavy: "Heavy soil", custom: "Custom adjustment" };
+
+  var DEFAULT_PRICEBOOK = {
+    multipliers: { coupe: 0.9, sedan: 1.0, suv: 1.25, truck: 1.25, row3: 1.4 },
+    packages: [
+      {id:"express",  name:"Express Wash",       base:79,  hours:1},
+      {id:"interior", name:"Interior Detail",    base:149, hours:3},
+      {id:"exterior", name:"Exterior Detail",    base:129, hours:2.5},
+      {id:"full",     name:"Full Detail",        base:249, hours:5},
+      {id:"paint",    name:"Paint Enhancement",  base:449, hours:8},
+      {id:"ceramic",  name:"Ceramic Coating Prep", base:349, hours:6},
+      {id:"correction1", name:"One-Step Paint Correction", base:399, hours:6},
+      {id:"correction2", name:"Two-Step Paint Correction", base:649, hours:10},
+      {id:"coating",  name:"Ceramic Coating",      base:699, hours:8},
+      {id:"coatmaint",name:"Coating Maintenance",  base:149, hours:2}
+    ],
+    overrides: {},
+    addons: [
+      {id:"pethair",   name:"Pet hair removal",            price:45},
+      {id:"engine",    name:"Engine bay cleaning",         price:40},
+      {id:"headlight", name:"Headlight restoration",       price:60},
+      {id:"odor",      name:"Odor treatment",              price:55},
+      {id:"clay",      name:"Clay bar treatment",          price:50},
+      {id:"extraction",name:"Seat extraction",             price:65},
+      {id:"soil",      name:"Excessive-soil surcharge",    price:35}
+    ]
+  };
+
+  var TEXT_FIELDS = ["shopName","shopPhone","shopEmail","customerName",
+                     "vehicleYear","vehicleMake","vehicleModel","paymentLink"];
+  var NUM_FIELDS  = ["conditionPct","taxPct","estHours","hourlyRate","suppliesCost",
+                     "targetMarginPct","travelCost","overheadCost","processingPct",
+                     "conditionFixed","conditionHours","depositPct","depositFixed"];
+
+  function $(id){ return document.getElementById(id); }
+  function round2(v){ return Math.round(v * 100) / 100; }
+  function usd(v){ return "$" + v.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function numVal(id){
+    var v = parseFloat($(id).value);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  }
+  function vehicleLabel(id){
+    for(var i = 0; i < VEHICLE_TYPES.length; i++){ if(VEHICLE_TYPES[i].id === id){ return VEHICLE_TYPES[i].label; } }
+    return "Sedan";
+  }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  // ---- Price book (persisted; Pro-editable) ----
+  function loadPriceBook(){
+    try {
+      var raw = localStorage.getItem(PRICEBOOK_KEY);
+      if(!raw){ return clone(DEFAULT_PRICEBOOK); }
+      var pb = JSON.parse(raw);
+      if(!pb || !Array.isArray(pb.packages) || !Array.isArray(pb.addons) || !pb.multipliers){ return clone(DEFAULT_PRICEBOOK); }
+      // Merge in any packages added since this price book was saved, and
+      // make sure per-size overrides exist as a clean object.
+      DEFAULT_PRICEBOOK.packages.forEach(function(def){
+        var found = false;
+        pb.packages.forEach(function(p){
+          if(p.id === def.id){ found = true; if(typeof p.hours !== "number"){ p.hours = def.hours; } }
+        });
+        if(!found){ pb.packages.push(clone(def)); }
+      });
+      if(!pb.overrides || typeof pb.overrides !== "object"){ pb.overrides = {}; }
+      Object.keys(pb.overrides).forEach(function(pid){
+        var row = pb.overrides[pid];
+        if(!row || typeof row !== "object"){ delete pb.overrides[pid]; return; }
+        Object.keys(row).forEach(function(vt){
+          if(typeof row[vt] !== "number" || !(row[vt] >= 0)){ delete row[vt]; }
+        });
+      });
+      return pb;
+    } catch(e){ return clone(DEFAULT_PRICEBOOK); }
+  }
+  function storePriceBook(pb){
+    try { localStorage.setItem(PRICEBOOK_KEY, JSON.stringify(pb)); } catch(e){ /* storage full/blocked */ }
+  }
+  var priceBook = loadPriceBook();
+
+  function findPackage(pb, id){
+    for(var i = 0; i < pb.packages.length; i++){ if(pb.packages[i].id === id){ return pb.packages[i]; } }
+    return pb.packages[0];
+  }
+  function findAddon(pb, id){
+    for(var i = 0; i < pb.addons.length; i++){ if(pb.addons[i].id === id){ return pb.addons[i]; } }
+    return null;
+  }
+
+  // Per-size price overrides: an explicit price for one package in one
+  // vehicle size wins over base x multiplier; blank means "use the formula".
+  function packagePriceFor(pb, pkg, vehicleType){
+    var ov = pb.overrides && pb.overrides[pkg.id] && pb.overrides[pkg.id][vehicleType];
+    if(typeof ov === "number" && ov >= 0){ return round2(ov); }
+    var mult = pb.multipliers[vehicleType];
+    if(typeof mult !== "number" || !(mult > 0)){ mult = 1; }
+    return round2(pkg.base * mult);
+  }
+
+  // ---- Core quote math (also documented in README.md) ----
+  // Margin is a true share of the price: profit / price, never a markup on cost.
+  // The customer-facing lines carry services and prices ONLY -- cost, profit,
+  // margin, and target margin live in the private fields of the result and
+  // never leave it. The deposit link is the detailer's own and MAY appear on
+  // the customer quote by design; DetailBid never handles the money.
+  function calculateQuote(state, pb){
+    pb = pb || priceBook;
+    var pkg = findPackage(pb, state.packageId);
+    var packagePrice = packagePriceFor(pb, pkg, state.vehicleType);
+    var vLabel = vehicleLabel(state.vehicleType);
+    var lines = [{ label: pkg.name + " (" + vLabel + ")", amount: packagePrice }];
+    var addonsTotal = 0;
+    (state.addonIds || []).forEach(function(id){
+      var a = findAddon(pb, id);
+      if(a){ lines.push({ label: a.name, amount: round2(a.price) }); addonsTotal += a.price; }
+    });
+    addonsTotal = round2(addonsTotal);
+    var subtotal = round2(packagePrice + addonsTotal);
+    // Condition adjustment: % of subtotal, a fixed amount, or extra labor
+    // hours (which also raise the estimated cost, or the profit would lie).
+    var condMode = state.conditionMode || "pct";
+    var extraHours = 0;
+    var conditionAdj = 0;
+    if(condMode === "fixed"){
+      conditionAdj = round2(state.conditionFixed || 0);
+    } else if(condMode === "hours"){
+      extraHours = state.conditionHours || 0;
+      conditionAdj = round2(extraHours * (state.hourlyRate || 0));
+    } else {
+      conditionAdj = round2(subtotal * (state.conditionPct || 0) / 100);
+    }
+    var baseJobPrice = round2(subtotal + conditionAdj);
+    // Profit Guard adjustment is a plain line on the quote: it lifts the
+    // price, nothing else. It is added after the condition adjustment.
+    var priceAdjustment = round2(state.priceAdjustment || 0);
+    if(priceAdjustment > 0){
+      lines.push({ label: "Price adjustment", amount: priceAdjustment });
+    }
+    var jobPrice = round2(baseJobPrice + priceAdjustment);
+    var tax = round2(jobPrice * (state.taxPct || 0) / 100);
+    var total = round2(jobPrice + tax);
+    // Fuller cost model: processing fees are a % of the pre-adjustment job
+    // price (so applying the Guard's recommendation lands exactly on the
+    // target), and tax stays out of profit math entirely.
+    var processingFee = round2(baseJobPrice * (state.processingPct || 0) / 100);
+    var effHours = (state.estHours || 0) + extraHours;
+    var estCost = round2((state.hourlyRate || 0) * effHours + (state.suppliesCost || 0)
+                         + (state.travelCost || 0) + (state.overheadCost || 0) + processingFee);
+    var profit = round2(jobPrice - estCost);
+    var marginPct = jobPrice > 0 ? (profit / jobPrice * 100) : 0;
+    var earningsPerHour = effHours > 0 ? round2(profit / effHours) : 0;
+    // Profit Guard: the minimum job price that earns the target margin.
+    var target = state.targetMarginPct;
+    if(typeof target !== "number" || isNaN(target)){ target = 0; }
+    target = Math.min(Math.max(target, 0), 99);
+    var minPrice = (estCost > 0 && target > 0) ? round2(estCost / (1 - target / 100)) : estCost;
+    var shortfall = (target > 0 && minPrice > jobPrice) ? round2(minPrice - jobPrice) : 0;
+    // Deposit: % of the quote total, or a fixed amount, capped at the total.
+    // The detailer collects it themselves through their own payment link.
+    var depType = state.depositType || "none";
+    var depositAmount = 0;
+    if(depType === "pct"){
+      depositAmount = round2(total * (state.depositPct || 0) / 100);
+    } else if(depType === "fixed"){
+      depositAmount = round2(state.depositFixed || 0);
+    }
+    if(depositAmount > total){ depositAmount = total; }
+    var depositBalance = round2(total - depositAmount);
+    return {
+      lines: lines, packageName: pkg.name, vehicleLabel: vLabel,
+      packagePrice: packagePrice, addonsTotal: addonsTotal, subtotal: subtotal,
+      conditionAdj: conditionAdj, conditionMode: condMode, extraHours: extraHours,
+      baseJobPrice: baseJobPrice, priceAdjustment: priceAdjustment,
+      jobPrice: jobPrice, tax: tax, total: total,
+      estHours: effHours, estCost: estCost, processingFee: processingFee,
+      profit: profit, marginPct: marginPct, earningsPerHour: earningsPerHour,
+      targetMarginPct: target, minPrice: minPrice, shortfall: shortfall,
+      depositAmount: depositAmount, depositBalance: depositBalance,
+      depositConfigured: depositAmount > 0, paymentLink: state.paymentLink || ""
+    };
+  }
+
+  // ---- Builder state ----
+  var packageRadios = [];  // [{id, input}]
+  var addonChecks = [];    // [{id, input}]
+  var priceAdjustment = 0; // Profit Guard adjustment on the current quote ($)
+
+  function selectedPackageId(){
+    for(var i = 0; i < packageRadios.length; i++){ if(packageRadios[i].input.checked){ return packageRadios[i].id; } }
+    return priceBook.packages.length ? priceBook.packages[0].id : "";
+  }
+  function selectedAddonIds(){
+    var ids = [];
+    addonChecks.forEach(function(a){ if(a.input.checked){ ids.push(a.id); } });
+    return ids;
+  }
+
+  function readState(){
+    var st = {};
+    TEXT_FIELDS.forEach(function(id){ st[id] = $(id).value.trim(); });
+    NUM_FIELDS.forEach(function(id){ st[id] = numVal(id); });
+    st.vehicleType = $("vehicleType").value || "sedan";
+    st.conditionPreset = $("conditionPreset").value || "light";
+    st.conditionMode = $("conditionMode").value || "pct";
+    st.priceAdjustment = priceAdjustment;
+    st.depositType = $("depositType").value || "none";
+    st.packageId = selectedPackageId();
+    st.addonIds = selectedAddonIds();
+    return st;
+  }
+
+  function vehicleText(st){
+    var parts = [st.vehicleYear, st.vehicleMake, st.vehicleModel].filter(function(s){ return !!s; });
+    var base = parts.length ? parts.join(" ") : "Vehicle";
+    return base + " (" + vehicleLabel(st.vehicleType) + ")";
+  }
+  function conditionText(st, r){
+    var label = CONDITION_LABELS[st.conditionPreset] || "Custom adjustment";
+    var mode = (r && r.conditionMode) || st.conditionMode || "pct";
+    if(mode === "fixed"){
+      return (r && r.conditionAdj > 0) ? label + " (fixed " + usd(r.conditionAdj) + ")" : label + " — no adjustment";
+    }
+    if(mode === "hours"){
+      return (r && r.extraHours > 0) ? label + " (+" + r.extraHours + " extra hours)" : label + " — no adjustment";
+    }
+    if(!st.conditionPct){ return label + " — no adjustment"; }
+    return label + " (+" + st.conditionPct + "%)";
+  }
+
+  // ---- Builder list rendering (packages + add-ons from the price book) ----
+  function renderBuilderLists(preserve){
+    var keepPkg = preserve ? selectedPackageId() : null;
+    var keepAddons = preserve ? selectedAddonIds() : null;
+
+    var plist = $("packageList");
+    plist.innerHTML = "";
+    packageRadios = [];
+    priceBook.packages.forEach(function(pkg, idx){
+      var label = document.createElement("label");
+      label.className = "check";
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = "pkgChoice";
+      input.value = pkg.id;
+      var isSel = preserve ? (pkg.id === keepPkg) : (pkg.id === "full");
+      input.checked = !!isSel;
+      input.addEventListener("change", function(){
+        if(input.checked){ $("estHours").value = pkg.hours; }
+        render();
+      });
+      var txt = document.createElement("span");
+      txt.textContent = pkg.name;
+      var price = document.createElement("span");
+      price.className = "price";
+      price.textContent = usd(packagePriceFor(priceBook, pkg, $("vehicleType").value || "sedan"));
+      label.appendChild(input);
+      label.appendChild(txt);
+      label.appendChild(price);
+      plist.appendChild(label);
+      packageRadios.push({id: pkg.id, input: input});
+    });
+    // Guarantee exactly one selection
+    if(!packageRadios.some(function(p){ return p.input.checked; }) && packageRadios.length){
+      packageRadios[0].input.checked = true;
+    }
+
+    var alist = $("addonList");
+    alist.innerHTML = "";
+    addonChecks = [];
+    priceBook.addons.forEach(function(a){
+      var label = document.createElement("label");
+      label.className = "check";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = a.id;
+      input.checked = keepAddons ? (keepAddons.indexOf(a.id) !== -1) : false;
+      input.addEventListener("change", render);
+      var txt = document.createElement("span");
+      txt.textContent = a.name;
+      var price = document.createElement("span");
+      price.className = "price";
+      price.textContent = usd(round2(a.price));
+      label.appendChild(input);
+      label.appendChild(txt);
+      label.appendChild(price);
+      alist.appendChild(label);
+      addonChecks.push({id: a.id, input: input});
+    });
+  }
+
+  function setBuilderSelection(packageId, addonIds){
+    packageRadios.forEach(function(p){ p.input.checked = (p.id === packageId); });
+    if(!packageRadios.some(function(p){ return p.input.checked; }) && packageRadios.length){
+      packageRadios[0].input.checked = true;
+    }
+    addonChecks.forEach(function(a){ a.input.checked = (addonIds || []).indexOf(a.id) !== -1; });
+  }
+
+  // ---- Render results + preview ----
+  function render(){
+    var st = readState();
+    var r = calculateQuote(st);
+    $("rPackage").textContent     = usd(r.packagePrice);
+    $("rAddons").textContent      = usd(r.addonsTotal);
+    $("rSubtotal").textContent    = usd(r.subtotal);
+    $("rConditionAdj").textContent = usd(r.conditionAdj);
+    $("rTax").textContent         = usd(r.tax);
+    $("rTotal").textContent       = usd(r.total);
+    $("rEstHours").textContent    = r.estHours ? String(r.estHours) : "0";
+    $("rCost").textContent        = usd(r.estCost);
+    $("rProfit").textContent      = usd(r.profit);
+    $("rMargin").textContent      = r.jobPrice > 0 ? r.marginPct.toFixed(1) + "%" : "—";
+    $("rEarnHr").textContent      = r.estHours > 0 ? usd(r.earningsPerHour) + "/hr" : "—";
+    $("rMinPrice").textContent    = usd(r.minPrice);
+    $("marginWarning").style.display = (r.jobPrice > 0 && r.marginPct < 10) ? "block" : "none";
+    // Profit Guard: warn and offer the exact fix when the quote is below
+    // the target margin; the adjustment line itself is a plain price line.
+    if(r.jobPrice > 0 && r.shortfall > 0){
+      $("guardText").textContent = "This quote earns " + r.marginPct.toFixed(1) + "% margin — below your " + r.targetMarginPct + "% target. Increase by at least " + usd(r.shortfall) + " to reach it.";
+      $("guardWarning").style.display = "block";
+      $("applyGuardBtn").textContent = "Apply recommended price — set quote to " + usd(r.minPrice);
+    } else {
+      $("guardWarning").style.display = "none";
+    }
+    if(r.priceAdjustment > 0){
+      $("adjAmount").textContent = usd(r.priceAdjustment);
+      $("adjNote").style.display = "block";
+    } else {
+      $("adjNote").style.display = "none";
+    }
+    renderPreview(st, r);
+    saveSettings();
+    return { state: st, r: r };
+  }
+
+  function renderPreview(st, r){
+    var today = new Date().toLocaleDateString("en-US",{year:"numeric", month:"long", day:"numeric"});
+    $("pvShop").textContent = st.shopName || "Your Detailing Shop";
+    var contact = [st.shopPhone, st.shopEmail].filter(function(s){ return !!s; }).join(" · ");
+    $("pvContact").textContent = contact;
+    $("pvCustomer").textContent = st.customerName || "Your Customer";
+    $("pvDate").textContent = today;
+    $("pvVehicle").textContent = vehicleText(st);
+    var box = $("pvLines");
+    box.innerHTML = "";
+    r.lines.forEach(function(line){
+      var row = document.createElement("div");
+      row.className = "li-row";
+      var a = document.createElement("span"); a.textContent = line.label;
+      var b = document.createElement("span"); b.textContent = usd(line.amount);
+      row.appendChild(a); row.appendChild(b);
+      box.appendChild(row);
+    });
+    $("pvSubtotal").textContent = usd(r.subtotal);
+    $("pvCondition").textContent = conditionText(st, r);
+    if(r.depositConfigured){
+      $("pvDepositAmt").textContent = usd(r.depositAmount);
+      $("pvDepositBal").textContent = usd(r.depositBalance);
+      $("pvDepositLinkRow").style.display = r.paymentLink ? "block" : "none";
+      $("pvDepositLink").textContent = r.paymentLink || "";
+      $("pvDeposit").style.display = "block";
+    } else {
+      $("pvDeposit").style.display = "none";
+    }
+    $("pvTaxRow").style.display = r.tax > 0 ? "flex" : "none";
+    $("pvTax").textContent = usd(r.tax);
+    $("pvHours").textContent = r.estHours ? "About " + r.estHours + " hours" : "—";
+    $("pvTotal").textContent = usd(r.total);
+    $("pvTerms").textContent = "This quote is valid for 14 days from the date above. Prices cover the services listed; additional services requested on the day will be quoted before work begins.";
+  }
+
+  TEXT_FIELDS.concat(NUM_FIELDS).forEach(function(id){ $(id).addEventListener("input", render); });
+  $("vehicleType").addEventListener("change", function(){ renderBuilderLists(true); render(); });
+  $("conditionPreset").addEventListener("change", function(){
+    var p = $("conditionPreset").value;
+    if(CONDITION_PRESETS.hasOwnProperty(p)){ $("conditionPct").value = CONDITION_PRESETS[p]; }
+    render();
+  });
+  $("conditionPct").addEventListener("input", function(){
+    var v = numVal("conditionPct");
+    var match = "custom";
+    Object.keys(CONDITION_PRESETS).forEach(function(k){ if(CONDITION_PRESETS[k] === v){ match = k; } });
+    $("conditionPreset").value = match;
+    render();
+  });
+
+  function syncConditionInputs(){
+    var mode = $("conditionMode").value || "pct";
+    $("condPctField").style.display = mode === "pct" ? "block" : "none";
+    $("condFixedField").style.display = mode === "fixed" ? "block" : "none";
+    $("condHoursField").style.display = mode === "hours" ? "block" : "none";
+  }
+  $("conditionMode").addEventListener("change", function(){ syncConditionInputs(); render(); });
+
+  function syncDepositInputs(){
+    var t = $("depositType").value || "none";
+    $("depositPctField").style.display = t === "pct" ? "block" : "none";
+    $("depositFixedField").style.display = t === "fixed" ? "block" : "none";
+  }
+  $("depositType").addEventListener("change", function(){ syncDepositInputs(); render(); });
+  $("followupDays").addEventListener("input", function(){ renderSaved(); });
+
+  // Profit Guard: one tap adds the exact shortfall as a plain "Price
+  // adjustment" line; removing it restores the original quote.
+  $("applyGuardBtn").addEventListener("click", function(){
+    var out = render();
+    if(out.r.shortfall > 0){
+      priceAdjustment = out.r.shortfall;
+      render();
+    }
+  });
+  $("removeAdjBtn").addEventListener("click", function(){
+    priceAdjustment = 0;
+    render();
+  });
+
+  // ---- Settings: shop fields + logo (persisted) ----
+  var logoDataUrl = "";
+  var logoImg = (typeof Image !== "undefined") ? new Image() : null;
+
+  function loadSettings(){
+    try {
+      var raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+  function saveSettings(){
+    var s = loadSettings();
+    s.shopName  = $("shopName").value;
+    s.shopPhone = $("shopPhone").value;
+    s.shopEmail = $("shopEmail").value;
+    s.targetMarginPct = $("targetMarginPct").value;
+    s.depositType = $("depositType").value;
+    s.depositPct = $("depositPct").value;
+    s.depositFixed = $("depositFixed").value;
+    s.paymentLink = $("paymentLink").value;
+    s.followupDays = $("followupDays").value;
+    s.logo = logoDataUrl || "";
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch(e){ /* storage full/blocked */ }
+  }
+  function applySettings(){
+    var s = loadSettings();
+    if(s.shopName){ $("shopName").value = s.shopName; }
+    if(s.shopPhone){ $("shopPhone").value = s.shopPhone; }
+    if(s.shopEmail){ $("shopEmail").value = s.shopEmail; }
+    if(s.targetMarginPct !== undefined && s.targetMarginPct !== null && s.targetMarginPct !== ""){ $("targetMarginPct").value = s.targetMarginPct; }
+    if(s.depositType){ $("depositType").value = s.depositType; }
+    if(s.depositPct !== undefined && s.depositPct !== null && s.depositPct !== ""){ $("depositPct").value = s.depositPct; }
+    if(s.depositFixed !== undefined && s.depositFixed !== null && s.depositFixed !== ""){ $("depositFixed").value = s.depositFixed; }
+    if(s.paymentLink){ $("paymentLink").value = s.paymentLink; }
+    if(s.followupDays !== undefined && s.followupDays !== null && s.followupDays !== ""){ $("followupDays").value = s.followupDays; }
+    if(s.logo){ setLogo(s.logo, true); }
+    syncConditionInputs();
+    syncDepositInputs();
+  }
+  function setLogo(dataUrl, silent){
+    logoDataUrl = dataUrl || "";
+    if(logoImg && logoDataUrl){ logoImg.src = logoDataUrl; }
+    $("logoStatus").textContent = logoDataUrl ? "Logo uploaded — it will appear on your PDF quotes." : "No logo uploaded.";
+    $("removeLogoBtn").style.display = logoDataUrl ? "inline-block" : "none";
+    if(!silent){ saveSettings(); }
+  }
+  $("logoInput").addEventListener("change", function(){
+    var f = $("logoInput").files && $("logoInput").files[0];
+    if(!f){ return; }
+    var reader = new FileReader();
+    reader.onload = function(){ setLogo(String(reader.result || "")); render(); };
+    reader.onerror = function(){ alert("That logo file couldn't be read. Try a PNG or JPG."); };
+    reader.readAsDataURL(f);
+  });
+  $("removeLogoBtn").addEventListener("click", function(){
+    $("logoInput").value = "";
+    setLogo("");
+    render();
+  });
+
+  // ---- Pro state + first-free-PDF ----
+  function isPro(){
+    try { return localStorage.getItem(PRO_KEY) === "1"; } catch(e){ return false; }
+  }
+  function freePdfUsed(){
+    try { return parseInt(localStorage.getItem(FREEPDF_KEY) || "0", 10) || 0; } catch(e){ return 0; }
+  }
+  function setFreePdfUsed(n){
+    try { localStorage.setItem(FREEPDF_KEY, String(n)); } catch(e){ /* ignore */ }
+  }
+  function renderPdfNote(){
+    if(isPro()){
+      $("pdfNote").textContent = "Your clean, branded quote — logo, services, terms, and acceptance line. Prices and services only: your rate, product costs, and margin never appear on it.";
+    } else if(freePdfUsed() >= 1){
+      $("pdfNote").textContent = "You've used your one free PDF quote. Pro unlocks unlimited clean PDFs — plus your price book, saved quotes, and the dashboard.";
+    } else {
+      $("pdfNote").textContent = "Your first clean PDF quote is free — no watermark, your logo, ready to send. After that, PDFs are a Pro feature.";
+    }
+  }
+  function renderPro(){
+    var pro = isPro();
+    $("proGate").style.display = pro ? "none" : "block";
+    $("proArea").style.display = pro ? "block" : "none";
+    renderPdfNote();
+    if(pro){ renderSaved(); renderPriceBook(); }
+  }
+  $("unlockBtn").addEventListener("click", function(){
+    try { localStorage.setItem(PRO_KEY, "1"); } catch(e){ /* ignore */ }
+    renderPro();
+  });
+  $("lockBtn").addEventListener("click", function(){
+    try { localStorage.removeItem(PRO_KEY); } catch(e){ /* ignore */ }
+    renderPro();
+  });
+
+  // ---- Price book editor (Pro) ----
+  var pbPkgInputs = {}, pbMultInputs = {}, pbAddonInputs = {}, pbMatrixInputs = {};
+  function pbRow(container, labelText, inputId, value){
+    var row = document.createElement("div");
+    row.className = "pb-row";
+    var lab = document.createElement("label");
+    lab.textContent = labelText;
+    lab.setAttribute("for", inputId);
+    var input = document.createElement("input");
+    input.type = "number";
+    input.min = "0";
+    input.step = "any";
+    input.id = inputId;
+    input.value = value;
+    row.appendChild(lab);
+    row.appendChild(input);
+    container.appendChild(row);
+    return input;
+  }
+  function renderPriceBook(){
+    var pc = $("pbPackages"); pc.innerHTML = "";
+    pbPkgInputs = {};
+    priceBook.packages.forEach(function(pkg){ pbPkgInputs[pkg.id] = pbRow(pc, pkg.name, "pb_pkg_" + pkg.id, pkg.base); });
+    var mc = $("pbMultipliers"); mc.innerHTML = "";
+    pbMultInputs = {};
+    VEHICLE_TYPES.forEach(function(vt){ pbMultInputs[vt.id] = pbRow(mc, vt.label + " multiplier (×)", "pb_mult_" + vt.id, priceBook.multipliers[vt.id]); });
+    var ac = $("pbAddons"); ac.innerHTML = "";
+    pbAddonInputs = {};
+    priceBook.addons.forEach(function(a){ pbAddonInputs[a.id] = pbRow(ac, a.name, "pb_addon_" + a.id, a.price); });
+    // Per-size override matrix: blank = use base x multiplier.
+    var mx = $("pbMatrix"); mx.innerHTML = "";
+    pbMatrixInputs = {};
+    var head = document.createElement("div");
+    head.className = "pb-matrix-row pb-matrix-head";
+    var hc = document.createElement("span"); hc.textContent = "Package"; head.appendChild(hc);
+    VEHICLE_TYPES.forEach(function(vt){
+      var h = document.createElement("span"); h.textContent = vt.label; head.appendChild(h);
+    });
+    mx.appendChild(head);
+    priceBook.packages.forEach(function(pkg){
+      var row = document.createElement("div");
+      row.className = "pb-matrix-row";
+      var lab = document.createElement("span");
+      lab.textContent = pkg.name;
+      row.appendChild(lab);
+      pbMatrixInputs[pkg.id] = {};
+      VEHICLE_TYPES.forEach(function(vt){
+        var inp = document.createElement("input");
+        inp.type = "number"; inp.min = "0"; inp.step = "any";
+        inp.id = "pb_ov_" + pkg.id + "_" + vt.id;
+        var ov = priceBook.overrides && priceBook.overrides[pkg.id] && priceBook.overrides[pkg.id][vt.id];
+        inp.value = (typeof ov === "number") ? String(ov) : "";
+        inp.placeholder = String(round2(pkg.base * (priceBook.multipliers[vt.id] || 1)));
+        row.appendChild(inp);
+        pbMatrixInputs[pkg.id][vt.id] = inp;
+      });
+      mx.appendChild(row);
+    });
+  }
+  $("savePriceBookBtn").addEventListener("click", function(){
+    if(!isPro()){ alert("The price book is a Pro feature. Subscribe or unlock Pro below."); return; }
+    var next = clone(priceBook);
+    var ok = true;
+    next.packages.forEach(function(pkg){
+      var v = parseFloat(pbPkgInputs[pkg.id] ? pbPkgInputs[pkg.id].value : "");
+      if(isNaN(v) || v < 0){ ok = false; } else { pkg.base = round2(v); }
+    });
+    VEHICLE_TYPES.forEach(function(vt){
+      var v = parseFloat(pbMultInputs[vt.id] ? pbMultInputs[vt.id].value : "");
+      if(isNaN(v) || v <= 0){ ok = false; } else { next.multipliers[vt.id] = v; }
+    });
+    next.addons.forEach(function(a){
+      var v = parseFloat(pbAddonInputs[a.id] ? pbAddonInputs[a.id].value : "");
+      if(isNaN(v) || v < 0){ ok = false; } else { a.price = round2(v); }
+    });
+    var nextOverrides = {};
+    priceBook.packages.forEach(function(pkg){
+      VEHICLE_TYPES.forEach(function(vt){
+        var inp = pbMatrixInputs[pkg.id] && pbMatrixInputs[pkg.id][vt.id];
+        var raw = inp ? String(inp.value).trim() : "";
+        if(raw === ""){ return; }
+        var v = parseFloat(raw);
+        if(isNaN(v) || v < 0){ ok = false; return; }
+        if(!nextOverrides[pkg.id]){ nextOverrides[pkg.id] = {}; }
+        nextOverrides[pkg.id][vt.id] = round2(v);
+      });
+    });
+    next.overrides = nextOverrides;
+    if(!ok){ alert("Price book not saved: prices must be 0 or more, and multipliers must be above 0. Check the numbers and try again."); return; }
+    priceBook = next;
+    storePriceBook(priceBook);
+    renderBuilderLists(true);
+    renderPriceBook();
+    render();
+    alert("Price book saved. New quotes now use these prices — quotes you already saved keep their saved prices.");
+  });
+  $("resetPriceBookBtn").addEventListener("click", function(){
+    if(!isPro()){ alert("The price book is a Pro feature. Subscribe or unlock Pro below."); return; }
+    priceBook = clone(DEFAULT_PRICEBOOK);
+    storePriceBook(priceBook);
+    renderBuilderLists(true);
+    renderPriceBook();
+    render();
+    alert("Price book reset to the starter prices.");
+  });
+
+  // ---- Saved quotes / dashboard ----
+  // Each saved quote stores a full snapshot of its inputs AND its computed
+  // lines/totals at save time, so later price-book edits never change it.
+  function loadQuotes(){
+    try {
+      var raw = localStorage.getItem(QUOTES_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e){ return []; }
+  }
+  function storeQuotes(quotes){
+    try { localStorage.setItem(QUOTES_KEY, JSON.stringify(quotes)); }
+    catch(e){ alert("Could not save — this browser's storage is unavailable or full."); }
+  }
+
+  function renderSaved(){
+    var quotes = loadQuotes();
+    var box = $("savedList");
+    box.innerHTML = "";
+
+    var pipeline = 0, accepted = 0;
+    quotes.forEach(function(q){
+      var st = q.status || "Draft";
+      var amt = (q.computed && typeof q.computed.total === "number") ? q.computed.total : 0;
+      if(st === "Accepted" || st === "Completed"){ accepted += amt; }
+      else if(st === "Draft" || st === "Sent"){ pipeline += amt; }
+    });
+    $("totPipeline").textContent = usd(round2(pipeline));
+    $("totAccepted").textContent = usd(round2(accepted));
+
+    if(!quotes.length){
+      var p = document.createElement("p");
+      p.className = "empty-note";
+      p.textContent = "No saved quotes yet. Build a quote above and save it here.";
+      box.appendChild(p);
+      return;
+    }
+    quotes.forEach(function(q){
+      var row = document.createElement("div");
+      row.className = "saved-item";
+
+      var status = q.status || "Draft";
+      var chip = document.createElement("span");
+      chip.className = "status st-" + status;
+      chip.textContent = status;
+      row.appendChild(chip);
+
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = q.name;
+      row.appendChild(name);
+
+      var amtEl = document.createElement("span");
+      amtEl.className = "amt";
+      amtEl.textContent = usd((q.computed && q.computed.total) || 0);
+      row.appendChild(amtEl);
+
+      var date = document.createElement("span");
+      date.className = "date";
+      date.textContent = q.savedAt ? new Date(q.savedAt).toLocaleDateString("en-US") : "";
+      row.appendChild(date);
+
+      var sel = document.createElement("select");
+      sel.setAttribute("aria-label", "Quote status");
+      STATUSES.forEach(function(st){
+        var opt = document.createElement("option");
+        opt.value = st; opt.textContent = st;
+        if(st === status){ opt.selected = true; }
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", function(){
+        var all = loadQuotes();
+        all.forEach(function(x){
+          if(x.id === q.id){
+            x.status = sel.value;
+            if(sel.value === "Sent"){ x.sentAt = new Date().toISOString(); }
+          }
+        });
+        storeQuotes(all);
+        renderSaved();
+      });
+      row.appendChild(sel);
+
+      if(q.computed && q.computed.depositAmount > 0){
+        var depBtn = document.createElement("button");
+        depBtn.type = "button";
+        depBtn.className = "btn btn-ghost btn-small";
+        depBtn.textContent = q.depositReceived ? "Deposit ✓ received" : "Deposit pending";
+        depBtn.addEventListener("click", function(){
+          var all = loadQuotes();
+          all.forEach(function(x){ if(x.id === q.id){ x.depositReceived = !x.depositReceived; } });
+          storeQuotes(all);
+          renderSaved();
+        });
+        row.appendChild(depBtn);
+      }
+
+      var loadBtn = document.createElement("button");
+      loadBtn.type = "button";
+      loadBtn.className = "btn btn-ghost btn-small";
+      loadBtn.textContent = "Load";
+      loadBtn.addEventListener("click", function(){
+        applyQuoteInputs(q.inputs);
+        render();
+      });
+      row.appendChild(loadBtn);
+
+      var dupBtn = document.createElement("button");
+      dupBtn.type = "button";
+      dupBtn.className = "btn btn-ghost btn-small";
+      dupBtn.textContent = "Duplicate";
+      dupBtn.addEventListener("click", function(){
+        var all = loadQuotes();
+        var copy = clone(q);
+        copy.id = Date.now() + "";
+        copy.name = q.name + " (copy)";
+        copy.status = "Draft";
+        copy.savedAt = new Date().toISOString();
+        all.unshift(copy);
+        storeQuotes(all);
+        renderSaved();
+      });
+      row.appendChild(dupBtn);
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn btn-ghost btn-small";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", function(){
+        storeQuotes(loadQuotes().filter(function(x){ return x.id !== q.id; }));
+        renderSaved();
+      });
+      row.appendChild(delBtn);
+
+      box.appendChild(row);
+    });
+    renderFollowup(quotes);
+  }
+
+  function followupDays(){
+    var v = parseInt($("followupDays").value, 10);
+    if(isNaN(v) || v < 1){ v = 3; }
+    return v;
+  }
+  function quoteAgeDays(q){
+    var t = q.sentAt || q.savedAt;
+    if(!t){ return 0; }
+    var ms = Date.now() - new Date(t).getTime();
+    if(isNaN(ms) || ms < 0){ return 0; }
+    return Math.floor(ms / 86400000);
+  }
+  var lastFollowupMessage = "";
+  function buildFollowupMessage(q){
+    var s = loadSettings();
+    var shop = s.shopName || "your detailing shop";
+    var phone = s.shopPhone || "";
+    var who = (q.inputs && q.inputs.customerName) || "there";
+    var veh = q.inputs ? vehicleText(q.inputs) : "your vehicle";
+    var total = usd((q.computed && typeof q.computed.total === "number") ? q.computed.total : 0);
+    return "Hi " + who + ", this is " + shop + " following up on your detailing quote for your " + veh + " — " + total + ". The quote is valid for 14 days from when it was sent, and I'd be happy to get you booked in. Just reply here" + (phone ? " or call " + phone : "") + ". Thanks!";
+  }
+  function copyText(text){
+    lastFollowupMessage = text;
+    var done = false;
+    try {
+      if(typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text);
+        done = true;
+      }
+    } catch(e){ done = false; }
+    if(!done){
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        if(ta.select){ ta.select(); }
+        if(document.execCommand){ document.execCommand("copy"); }
+        document.body.removeChild(ta);
+      } catch(e){ /* clipboard unavailable — the message is shown in the alert below */ }
+    }
+    alert("Follow-up message ready to paste:\n\n" + text);
+  }
+  function renderFollowup(quotes){
+    var box = $("followupList");
+    box.innerHTML = "";
+    var days = followupDays();
+    var due = quotes.filter(function(q){
+      return (q.status || "Draft") === "Sent" && quoteAgeDays(q) >= days;
+    });
+    if(!due.length){
+      var p = document.createElement("p");
+      p.className = "empty-note";
+      p.textContent = "No sent quotes are waiting for a follow-up right now.";
+      box.appendChild(p);
+      return;
+    }
+    due.forEach(function(q){
+      var row = document.createElement("div");
+      row.className = "followup-item";
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = q.name;
+      row.appendChild(name);
+      var amt = document.createElement("span");
+      amt.className = "amt";
+      amt.textContent = usd((q.computed && q.computed.total) || 0);
+      row.appendChild(amt);
+      var d = document.createElement("span");
+      d.className = "days";
+      d.textContent = "waiting " + quoteAgeDays(q) + " days";
+      row.appendChild(d);
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-ghost btn-small";
+      btn.textContent = "Copy follow-up";
+      btn.addEventListener("click", function(){ copyText(buildFollowupMessage(q)); });
+      row.appendChild(btn);
+      box.appendChild(row);
+    });
+  }
+
+  function applyQuoteInputs(inp){
+    if(!inp){ return; }
+    TEXT_FIELDS.forEach(function(id){ if(inp[id] !== undefined && inp[id] !== null){ $(id).value = inp[id]; } });
+    NUM_FIELDS.forEach(function(id){ if(inp[id] !== undefined && inp[id] !== null){ $(id).value = inp[id]; } });
+    if(inp.vehicleType){ $("vehicleType").value = inp.vehicleType; }
+    if(inp.conditionPreset){ $("conditionPreset").value = inp.conditionPreset; }
+    if(inp.conditionMode){ $("conditionMode").value = inp.conditionMode; }
+    if(inp.depositType){ $("depositType").value = inp.depositType; }
+    if(typeof inp.priceAdjustment === "number"){ priceAdjustment = Math.max(0, inp.priceAdjustment); }
+    syncConditionInputs();
+    syncDepositInputs();
+    renderBuilderLists(false);
+    setBuilderSelection(inp.packageId, inp.addonIds);
+  }
+
+  $("saveQuoteBtn").addEventListener("click", function(){
+    if(!isPro()){ alert("Saving quotes is a Pro feature. Subscribe or unlock Pro below."); return; }
+    var out = render();
+    var st = out.state, r = out.r;
+    var name = $("quoteName").value.trim();
+    if(!name){
+      var who = st.customerName || "Untitled customer";
+      name = who + " — " + r.packageName + " (" + r.vehicleLabel + ")";
+    }
+    var quotes = loadQuotes();
+    quotes.unshift({
+      id: Date.now() + "", name: name, status: "Draft",
+      savedAt: new Date().toISOString(),
+      inputs: clone(st), computed: clone(r)
+    });
+    storeQuotes(quotes);
+    $("quoteName").value = "";
+    renderSaved();
+  });
+
+  // ---- Downloads: backup JSON / CSV ----
+  function download(filename, content, type){
+    var blob = new Blob([content], {type: type});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 500);
+  }
+
+  $("exportBackupBtn").addEventListener("click", function(){
+    var payload = {
+      app: "DetailBid Studio", version: 1,
+      exportedAt: new Date().toISOString(),
+      pro: isPro(),
+      settings: loadSettings(),
+      pricebook: priceBook,
+      quotes: loadQuotes()
+    };
+    download("detailbid-backup-" + new Date().toISOString().slice(0,10) + ".json",
+             JSON.stringify(payload, null, 2), "application/json");
+  });
+
+  function csvCell(v){
+    var s = (v === undefined || v === null) ? "" : String(v);
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  $("exportCsvBtn").addEventListener("click", function(){
+    var quotes = loadQuotes();
+    var lines = [["Quote name","Status","Customer","Vehicle","Package","Quote total","Saved date"].join(",")];
+    quotes.forEach(function(q){
+      lines.push([
+        csvCell(q.name), csvCell(q.status || "Draft"),
+        csvCell((q.inputs && q.inputs.customerName) || ""),
+        csvCell(q.inputs ? vehicleText(q.inputs) : ""),
+        csvCell((q.computed && q.computed.packageName) || ""),
+        csvCell(q.computed ? q.computed.total.toFixed(2) : ""),
+        csvCell(q.savedAt ? new Date(q.savedAt).toLocaleDateString("en-US") : "")
+      ].join(","));
+    });
+    download("detailbid-quotes-" + new Date().toISOString().slice(0,10) + ".csv",
+             lines.join("\n"), "text/csv");
+  });
+
+  $("importInput").addEventListener("change", function(){
+    var f = $("importInput").files && $("importInput").files[0];
+    if(!f){ return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var data = JSON.parse(String(reader.result || ""));
+        if(!data || data.app !== "DetailBid Studio" || !Array.isArray(data.quotes)){ throw new Error("bad file"); }
+        var newPb = null;
+        if(data.pricebook !== undefined && data.pricebook !== null){
+          var pb = data.pricebook;
+          if(!pb || !Array.isArray(pb.packages) || !Array.isArray(pb.addons) || !pb.multipliers){ throw new Error("bad pricebook"); }
+          newPb = pb;
+        }
+        // Validation passed — now apply.
+        storeQuotes(data.quotes);
+        if(newPb){ priceBook = newPb; storePriceBook(priceBook); }
+        if(data.settings){
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings)); } catch(e){ /* ignore */ }
+          logoDataUrl = "";
+          applySettings();
+        }
+        if(data.pro){ try { localStorage.setItem(PRO_KEY, "1"); } catch(e){ /* ignore */ } }
+        renderBuilderLists(true);
+        renderPro();
+        render();
+        alert("Backup restored: " + data.quotes.length + " quote(s) imported.");
+      } catch(e){
+        alert("That file doesn't look like a DetailBid Studio backup. Nothing was changed.");
+      }
+      $("importInput").value = "";
+    };
+    reader.onerror = function(){ alert("That file couldn't be read. Nothing was changed."); };
+    reader.readAsText(f);
+  });
+
+  // ---- Professional PDF quote ----
+  // IMPORTANT: the customer PDF shows services and prices ONLY — never the
+  // hourly rate, product costs, profit, or margin.
+  $("pdfBtn").addEventListener("click", function(){
+    var pro = isPro();
+    if(!pro && freePdfUsed() >= 1){
+      alert("You've used your one free PDF quote. Subscribe ($19/month founding price) or tap \u201CI already subscribed \u2014 unlock Pro\u201D below for unlimited PDFs.");
+      return;
+    }
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      alert("The PDF library couldn't load. Check your internet connection and try again — everything else on this page works offline. (Your free PDF has not been used.)");
+      return;
+    }
+    var out = render();
+    var st = out.state, r = out.r;
+    if(!(r.total > 0)){
+      alert("Add a package price first, then download the PDF.");
+      return;
+    }
+
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({unit:"pt", format:"letter"});
+    var pageW = doc.internal.pageSize.getWidth();
+    var marginX = 56;
+    var y = 60;
+
+    var shop = st.shopName || "Your Detailing Shop";
+    var today = new Date().toLocaleDateString("en-US",{year:"numeric", month:"long", day:"numeric"});
+
+    if(logoDataUrl && logoImg && logoImg.complete && logoImg.naturalWidth > 0){
+      var maxW = 150, maxH = 42;
+      var w = logoImg.naturalWidth, h = logoImg.naturalHeight;
+      var scale = Math.min(maxW / w, maxH / h);
+      var fmt = logoDataUrl.indexOf("data:image/png") === 0 ? "PNG" : "JPEG";
+      try {
+        doc.addImage(logoDataUrl, fmt, marginX, y - 8, Math.round(w * scale), Math.round(h * scale));
+        y += Math.round(h * scale) + 14;
+      } catch(e){ /* bad image data — skip logo */ }
+    }
+    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.setTextColor(31,31,35);
+    doc.text(shop, marginX, y); y += 16;
+    var contact = [st.shopPhone, st.shopEmail].filter(function(s){ return !!s; }).join("  ·  ");
+    if(contact){
+      doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(93,93,102);
+      doc.text(contact, marginX, y); y += 8;
+    }
+    doc.setDrawColor(193,39,45); doc.setLineWidth(2.5);
+    doc.line(marginX, y, pageW - marginX, y); y += 30;
+
+    doc.setTextColor(31,31,35); doc.setFontSize(15);
+    doc.text("Detailing Service Quote", marginX, y); y += 20;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(93,93,102);
+    if(st.customerName){ doc.text("Prepared for: " + st.customerName, marginX, y); y += 16; }
+    doc.text("Vehicle: " + vehicleText(st), marginX, y); y += 16;
+    doc.text("Date: " + today, marginX, y); y += 26;
+
+    doc.setTextColor(31,31,35); doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Services", marginX, y); y += 18;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11.5);
+    r.lines.forEach(function(line){
+      doc.text(line.label, marginX, y);
+      doc.text(usd(line.amount), marginX + 330, y);
+      y += 18;
+    });
+    y += 10;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Totals", marginX, y); y += 18;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11.5);
+    doc.text("Subtotal: " + usd(r.subtotal), marginX, y); y += 18;
+    if(r.conditionAdj > 0){
+      doc.text("Condition adjustment (" + conditionText(st, r) + "): " + usd(r.conditionAdj), marginX, y); y += 18;
+    }
+    if(r.tax > 0){
+      doc.text("Tax: " + usd(r.tax), marginX, y); y += 18;
+    }
+    if(r.estHours){
+      doc.text("Estimated time: about " + r.estHours + " hours", marginX, y); y += 18;
+    }
+    doc.setFont("helvetica","bold"); doc.setFontSize(13);
+    doc.text("Quote total:", marginX, y);
+    doc.setTextColor(143,29,34);
+    doc.text(usd(r.total), marginX + 130, y);
+    doc.setTextColor(31,31,35); y += 28;
+
+    if(r.depositConfigured){
+      doc.setFont("helvetica","bold"); doc.setFontSize(11.5);
+      doc.text("Deposit to reserve your appointment: " + usd(r.depositAmount), marginX, y); y += 18;
+      if(r.paymentLink){
+        doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(93,93,102);
+        doc.text("Pay the deposit here: " + r.paymentLink, marginX, y); y += 16;
+        doc.setTextColor(31,31,35);
+      }
+      doc.setFont("helvetica","normal"); doc.setFontSize(11.5);
+      doc.text("Remaining balance due at service: " + usd(r.depositBalance), marginX, y); y += 18;
+      y += 10;
+    }
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Terms", marginX, y); y += 18;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11.5);
+    var terms = "This quote is valid for 14 days from the date above. Prices cover the services listed; additional services requested on the day will be quoted before work begins.";
+    doc.splitTextToSize(terms, pageW - marginX * 2).forEach(function(line){
+      doc.text(line, marginX, y); y += 15;
+    });
+    y += 26;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Acceptance", marginX, y); y += 26;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(93,93,102);
+    var colW = (pageW - marginX * 2 - 30) / 2;
+    doc.setDrawColor(31,31,35); doc.setLineWidth(0.8);
+    doc.line(marginX, y, marginX + colW, y);
+    doc.line(marginX + colW + 30, y, marginX + colW * 2 + 30, y);
+    y += 15;
+    doc.text("Accepted by (customer name)" + (st.customerName ? " — " + st.customerName : ""), marginX, y);
+    doc.text("Signature & date", marginX + colW + 30, y);
+    y += 30;
+    doc.setFontSize(10);
+    doc.text(shop + (contact ? "  ·  " + contact : ""), marginX, y);
+
+    var fname = "detailbid-quote-" + new Date().toISOString().slice(0,10) + ".pdf";
+    doc.save(fname);
+    if(!pro){
+      setFreePdfUsed(freePdfUsed() + 1);
+      renderPdfNote();
+    }
+  });
+
+  // ---- Init ----
+  $("subscribeBtn").href = https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r;
+  applySettings();
+  renderBuilderLists(false);
+  // Default selection: Full Detail
+  setBuilderSelection("full", []);
+  renderPro();
+  render();
+
+  // Test/automation hook (harmless in production): exposes the pure math and
+  // state readers so the quote engine can be verified headlessly.
+  window.DetailBidStudio = {
+    calculateQuote: calculateQuote,
+    packagePriceFor: packagePriceFor,
+    loadQuotes: loadQuotes,
+    loadPriceBook: loadPriceBook,
+    renderSaved: renderSaved,
+    render: render,
+    isPro: isPro,
+    freePdfUsed: freePdfUsed,
+    round2: round2,
+    DEFAULT_PRICEBOOK: DEFAULT_PRICEBOOK,
+    VEHICLE_TYPES: VEHICLE_TYPES,
+    https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r: https://buy.stripe.com/eVq00keAjdXieLq09q0oM0r,
+    getLastFollowup: function(){ return lastFollowupMessage; }
+  };
+})();
+</script>
+</body>
+</html>
